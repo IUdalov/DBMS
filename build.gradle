@@ -1,0 +1,73 @@
+apply plugin: 'c'
+apply plugin: 'cpp'
+
+model {
+    components {
+        sqlite(NativeLibrarySpec) {
+            sources {
+                c {
+                    source {
+                        srcDir "src/sqlite"
+                        include "**/*.c"
+                    }
+                    exportedHeaders {
+                        srcDir "src/sqlite/include"
+                        include "**/*.h"
+                    }
+                }
+            }
+        }
+        dbms(NativeLibrarySpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDir "src/dbms"
+                        include "**/*.cpp"
+                    }
+                    exportedHeaders {
+                        srcDir "src/dbms/include"
+                        srcDir "src/dbms"
+                        include "**/*.h"
+                    }
+                }
+            }
+            binaries.all {
+                lib library: 'sqlite', linkage: 'static'
+            }
+        }
+        app(NativeExecutableSpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDir "src/dbms"
+                        include "**/*.cpp"
+                    }
+                    exportedHeaders {
+                        srcDir "src/dbms/include"
+                        srcDir "src/dbms"
+                        include "**/*.h"
+                    }
+                }
+            }
+            binaries.all {
+                lib library: 'sqlite', linkage: 'static'
+            }
+        }
+    }
+}
+
+binaries.all {
+    cppCompiler.args "-O0", "-Wall", "-std=c++11"
+}
+
+task shared(dependsOn: "dbmsSharedLibrary") {}
+
+task app(dependsOn: "appExecutable") {}
+
+task run(type: Exec) {
+    binaries.withType(NativeExecutableBinary).all { binary ->
+        dependsOn binary
+        executable binary.executableFile.path
+        workingDir "build"
+    }
+}
