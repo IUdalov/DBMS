@@ -31,5 +31,6 @@ void createCarsTable() {
 }
 
 void printCars() {
-    db.execute("SELECT * FROM Cars");
+    auto res = db.execute("SELECT * FROM Cars");
+    res.log();
 }

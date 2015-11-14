@@ -3,8 +3,23 @@
 #include <sqlite3.h>
 #include <exception>
 #include <iostream>
+#include <vector>
 
-int justPrintCallback(void *NotUsed, int argc, char **argv, char **azColName);
+int push_callback(void* execResult, int argc, char** argv, char** azColName);
+
+class ExecResult {
+public:
+    std::vector<std::string> title;
+    std::vector<std::vector<std::string>> data;
+public:
+    ExecResult();
+    ~ExecResult();
+    std::vector<std::string> operator[](size_t row);
+    size_t cols();
+    size_t rows();
+    // just for debug
+    void log();
+};
 
 class DBWrap {
 private:
@@ -14,6 +29,6 @@ public:
     ~DBWrap();
     std::string version();
     void touch(const std::string& databaseFile);
-    void execute(const std::string& query);
+    ExecResult execute(const std::string& query);
     void close();
 };
