@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 apply plugin: 'c'
 apply plugin: 'cpp'
 
@@ -57,6 +59,7 @@ model {
 }
 
 binaries.all {
+    if(Os.isFamily(Os.FAMILY_UNIX)) {linker.args "-lpthread", "-ldl"}
     cppCompiler.args "-O0", "-Wall", "-std=c++11"
 }
 
