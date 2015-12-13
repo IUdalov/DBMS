@@ -1,12 +1,10 @@
 #pragma once
 
-#include <sqlite3.h>
 #include <exception>
 #include <stdexcept>
 #include <iostream>
 #include <vector>
 
-int push_callback(void* execResult, int argc, char** argv, char** azColName);
 
 class ExecResult {
 public:
@@ -23,13 +21,10 @@ public:
 };
 
 class DBWrap {
-private:
-    sqlite3* db; // database context
 public:
-    DBWrap();
-    ~DBWrap();
-    std::string version();
-    void touch(const std::string& databaseFile);
-    ExecResult execute(const std::string& query);
-    void close();
+    virtual ~DBWrap(){}
+    virtual std::string version() = 0;
+    virtual void touch(const std::string& connectionString) = 0;
+    virtual ExecResult execute(const std::string& query) = 0;
+    virtual void close() = 0;
 };
