@@ -24,7 +24,7 @@ void PostgreSQLWrap::touch(const std::string& connectionString) {
 
 ExecResult PostgreSQLWrap::execute(const std::string& query) {
     PGresult *res = PQexec(db, (query + ";").c_str());
-
+    ExecResult wres();
     if (PQresultStatus(res) != PGRES_COMMAND_OK) {
         printf("Error msg: %s", PQerrorMessage(db));
         close();
@@ -36,14 +36,16 @@ ExecResult PostgreSQLWrap::execute(const std::string& query) {
     }
 
     for(int i = 0; i < PQntuples(res); i++) {
-
-        printf("%s %s %s\n", PQgetvalue(res, i, 0),
-            PQgetvalue(res, i, 1), PQgetvalue(res, i, 2));
+        std::vector<string> tmp;
+        for(int j = 0; j < PQnfields(res); j++) {
+            tmp.push_back(PQgetvalue(res, i, j));
+        }
+        ExecResult.data.push_back(tmp);
     }
 
     PQclear(res);
 
-    return ExecResult();
+    return wres;
 }
 
 void PostgreSQLWrap::close() {
