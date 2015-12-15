@@ -1,6 +1,9 @@
 #include <iostream>
 
-#define DBT_DEBUG
+#define BENCHMARK
+#ifndef BENCHMARK
+
+//#define DBT_DEBUG
 #include "datapack.h"
 
 using namespace dbt;
@@ -87,3 +90,5 @@ int main(void) {
     Print(pack);
     return 0;
 }
+
+#endif // BENCHMARK
