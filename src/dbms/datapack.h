@@ -23,8 +23,9 @@ namespace dbt {
                                      )
                                  );
             std::string query = \
-                    "DROP TABLE IF EXISTS " + m_name +
-                    ";CREATE TABLE " + m_name + "(";
+                    "DROP TABLE IF EXISTS " + m_name;
+            m_db.execute(query);
+            query = "CREATE TABLE " + m_name + "(";
             for(auto f : m_fields)
                 query += f.first + " " + f.second + ",";
             query.pop_back();

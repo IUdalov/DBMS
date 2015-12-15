@@ -4,6 +4,10 @@
 #ifndef BENCHMARK
 
 //#define DBT_DEBUG
+//#define POSTGRESQL
+
+#include <sqlite_impl.h>
+#include <postgres_impl.h>
 #include "datapack.h"
 
 using namespace dbt;
@@ -44,16 +48,37 @@ void Print(T& pack)
                      p.lname << ", " << p.age << ", "<< p.height << std::endl;
 }
 
-int main(void) {
-    DBWrap db;
-    db.touch("sample.db");
+void printUsage() {
+   std::cout << "Usage:" << std::endl;
+   std::cout << "./<binary name>" << " <sqlite|postgres> <connection string> "<< std::endl;
+}
+
+int main(int argc, char* argv[]) {
+    if (argc != 3) {
+        printUsage();
+        return 1; // 'user=iudalov dbname=dbms host=localhost'
+    }
+
+
+    std::shared_ptr<DBWrap> db = nullptr;
+    if (std::string(argv[1]) == std::string("sqlite")) {
+        db = std::make_shared<SQLiteWrap>();
+    } else if (std::string(argv[1]) == std::string("postgres")) {
+        db = std::make_shared<PostgreSQLWrap>();
+    } else {
+        printUsage();
+        return 1;
+    }
+    db->touch(argv[2]);
+
+
 
     /*
      *
      * Container creating
      *
      */
-    Datapack<std::string, std::string, std::string, int, double> pack("People", db);
+    Datapack<std::string, std::string, std::string, int, double> pack("People", *db);
 
     /*
      *
