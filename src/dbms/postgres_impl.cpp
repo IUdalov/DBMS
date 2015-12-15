@@ -1,5 +1,6 @@
 #include "postgres_impl.h"
 
+#ifdef POSTGRESQL
 PostgreSQLWrap::PostgreSQLWrap() : db(nullptr) {
 }
 
@@ -55,3 +56,4 @@ void PostgreSQLWrap::log() {
     std::cout << "touch: PSQL lib:" << std::to_string(PQlibVersion()) << std::endl;
     PQfinish(db);
 }
+#endif

@@ -2,9 +2,15 @@
 #include <time.h>
 #include <fstream>
 #include <unistd.h>
+#include <memory>
 
 //#define DBT_DEBUG
+//#define POSTGRESQL
 #include "datapack.h"
+#include "sqlite_impl.h"
+#ifdef POSTGRESQL
+    #include "postgres_impl.h"
+#endif
 
 using namespace dbt;
 
@@ -103,13 +109,37 @@ std::vector<std::pair<Query, std::string>> GenerateRequests(Datapack<std::string
     };
 }
 
+void printUsage() {
+   std::cout << "Usage:" << std::endl;
+   std::cout << "./<binary name>" << " <sqlite|postgres> <connection string> "<< std::endl;
+}
 
-int main(void) {
+int main(int argc, char* argv[]) {
+    if (argc != 3) {
+        printUsage();
+        return 1; // 'user=iudalov dbname=dbms host=localhost'
+    }
+
+
+    std::shared_ptr<DBWrap> db = nullptr;
+    if (std::string(argv[1]) == std::string("sqlite")) {
+        db = std::make_shared<SQLiteWrap>();
+    } else if (std::string(argv[1]) == std::string("postgres")) {
+        #ifdef POSTGRESQL
+            db = std::make_shared<PostgreSQLWrap>();
+        #else
+            std::cout << "PostgreSQL is not available. Define POSTGRESQL!" << std::endl;
+            return 1; // 'user=iudalov dbname=dbms host=localhost'
+        #endif
+    } else {
+        printUsage();
+        return 1;
+    }
+    db->touch(argv[2]);
+
     srand(0);
 
-    DBWrap db;
-    db.touch("BenchMark.db");
-    Datapack<std::string, int, double> pack("BenchMarkData", db);
+    Datapack<std::string, int, double> pack("BenchMarkData", *db);
 
     Timer timerUploading("uploading");
     for(int i = 0; i < DATA_SIZE; i++)

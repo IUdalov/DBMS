@@ -2,6 +2,7 @@
 
 #include "database.h"
 
+#ifdef POSTGRESQL
 #include <libpq-fe.h>
 
 class PostgreSQLWrap : public DBWrap {
@@ -17,3 +18,4 @@ public:
     // just for debug
     void log();
 };
+#endif
